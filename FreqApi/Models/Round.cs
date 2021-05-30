@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FreqApi.Model
+namespace FreqApi.Models
 {
     public class Round
     {
