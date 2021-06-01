@@ -10,8 +10,9 @@ namespace FreqApi.Models
         public Guid Id { get; set; }
         public string RoomCode { get; set; }
         public Phase Phase { get; set; }
-        public IEnumerable<Player> Players { get; set; }
         public DateTime CreationDate { get; set; }
+
+        public List<Player> Players { get; } = new List<Player>();
     }
 
     public enum Phase

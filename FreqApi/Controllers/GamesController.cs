@@ -80,7 +80,6 @@ namespace FreqApi.Controllers
             Game newgame = new Game();
             newgame.Id = Guid.NewGuid();
             newgame.Phase = Phase.Registration;
-            newgame.Players = new List<Player>();
             newgame.CreationDate = DateTime.Now;
             newgame.RoomCode = newgame.Id.ToString().Substring(0,4); //TODO ensure room code is unique...
 
