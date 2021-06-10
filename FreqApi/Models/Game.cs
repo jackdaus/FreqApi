@@ -12,7 +12,7 @@ namespace FreqApi.Models
         public Phase Phase { get; set; }
         public DateTime CreationDate { get; set; }
 
-        public List<Player> Players { get; } = new List<Player>();
+        public ICollection<Player> Players { get; set; }
     }
 
     public enum Phase

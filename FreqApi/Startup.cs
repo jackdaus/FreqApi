@@ -38,7 +38,7 @@ namespace FreqApi
                 .AllowCredentials());
             });
 
-            services.AddDbContext<FreqContext>(opt => opt.UseInMemoryDatabase(nameof(Game)));
+            services.AddDbContext<FreqContext>(options => options.UseSqlServer("Server=localhost;Database=Freq;Trusted_Connection=True;MultipleActiveResultSets=true"));
             services.AddControllers();
             services.AddSignalR();
             services.AddSwaggerGen(c =>
@@ -48,7 +48,7 @@ namespace FreqApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, FreqContext context)
         {
             if (env.IsDevelopment())
             {
@@ -70,6 +70,10 @@ namespace FreqApi
                 endpoints.MapControllers();
                 endpoints.MapHub<GameHub>("/gamehub");
             });
+
+            // Temporarily, use Create and Drop APIs for rapid prototyping during dev
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
         }
     }
 }

@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using FreqApi.Models;
 using System.Linq;
-
+using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace FreqApi.Hubs
 {
@@ -17,12 +19,33 @@ namespace FreqApi.Hubs
 
         public async Task JoinGame(string roomCode, string username)
         {
-            var game = _context.Games.Where(game => game.RoomCode == roomCode);
+            var game = _context.Games
+                    .Include(game => game.Players)
+                    .Where(game => game.RoomCode == roomCode && game.Phase == Phase.Registration)
+                    .FirstOrDefault();
             if (game == null)
             {
-
+                await Clients.Caller.SendAsync("errorRoomNotFound", roomCode);
             }
-            await Clients.Group(roomCode).SendAsync("newUserJoined", username);
+            else
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, roomCode);
+
+                Player player = new Player();
+                player.Id = Guid.NewGuid();
+                player.Username = username;
+                player.ConnectionId = Context.ConnectionId;
+
+                _context.Players.Add(player);
+                game.Players.Add(player);
+
+                await _context.SaveChangesAsync();
+                await Clients.Caller.SendAsync("joinSuccess", roomCode);
+
+                IEnumerable<String> playerNames = game.Players.Select(player => player.Username);
+
+                await Clients.Group(roomCode).SendAsync("newUserJoined", playerNames);
+            }
         }
 
         public async Task NewMessage(long username, string message)
