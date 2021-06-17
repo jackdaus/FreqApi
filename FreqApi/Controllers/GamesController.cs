@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FreqApi.Models;
+using FreqApi.Interfaces;
 
 namespace FreqApi.Controllers
 {
@@ -14,10 +15,12 @@ namespace FreqApi.Controllers
     public class GamesController : ControllerBase
     {
         private readonly FreqContext _context;
+        private readonly IGameService _gameService;
 
-        public GamesController(FreqContext context)
+        public GamesController(FreqContext context, IGameService gameService)
         {
             _context = context;
+            _gameService = gameService;
         }
 
         // GET: api/Games
@@ -31,7 +34,9 @@ namespace FreqApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Game>> GetGame(Guid id)
         {
-            var game = await _context.Games.FindAsync(id);
+            var game = await _context.Games
+                .Include(game => game.Players)
+                .SingleOrDefaultAsync(game => game.Id == id);
 
             if (game == null)
             {
@@ -77,11 +82,7 @@ namespace FreqApi.Controllers
         [HttpPost("new")]
         public async Task<ActionResult<Game>> PostNewGame()
         {
-            Game newgame = new Game();
-            newgame.Id = Guid.NewGuid();
-            newgame.Phase = Phase.Registration;
-            newgame.CreationDate = DateTime.Now;
-            newgame.RoomCode = newgame.Id.ToString().Substring(0,4); //TODO ensure room code is unique...
+            Game newgame = _gameService.CreateNewGame();
 
             _context.Games.Add(newgame);
             await _context.SaveChangesAsync();
@@ -113,6 +114,22 @@ namespace FreqApi.Controllers
             _context.Games.Remove(game);
             await _context.SaveChangesAsync();
 
+            return NoContent();
+        }
+
+        [HttpPut("start/{id}")]
+        public async Task<IActionResult> StartGame(Guid id)
+        {
+            var game = await _context.Games.FindAsync(id);
+
+            if (game == null)
+            {
+                return NotFound();
+            }
+
+            //TODO check to make sure phase is 0
+
+            this._gameService.StartGame(game.RoomCode);
             return NoContent();
         }
 

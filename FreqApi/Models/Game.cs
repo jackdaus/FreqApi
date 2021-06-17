@@ -15,6 +15,12 @@ namespace FreqApi.Models
         public ICollection<Player> Players { get; set; }
     }
 
+    public class ActiveGame
+    {
+        public Game Game { get; set; }
+        public System.Timers.Timer Timer { get; set; }
+    }
+
     public enum Phase
     {
         Registration,

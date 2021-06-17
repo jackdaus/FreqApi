@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using FreqApi.Models;
 using FreqApi.Hubs;
+using FreqApi.Services;
+using FreqApi.Interfaces;
 
 namespace FreqApi
 {
@@ -45,6 +47,7 @@ namespace FreqApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FreqApi", Version = "v1" });
             });
+            services.AddSingleton<IGameService, GameService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
