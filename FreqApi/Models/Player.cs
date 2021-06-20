@@ -10,6 +10,8 @@ namespace FreqApi.Models
         public Guid Id { get; set; }
         public string ConnectionId { get; set; }
         public string Username { get; set; }
+        public bool IsOwner { get; set; }
+        public int Position { get; set; }
         public int Points { get; set; }
         [System.Text.Json.Serialization.JsonIgnore] // skip serialization for now. Once we use DTO, not needed
 
