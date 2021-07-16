@@ -37,10 +37,8 @@ namespace FreqApi.Controllers
             Player player = new Player();
             player.Id = Guid.NewGuid();
             player.Username = username;
-            //player.GameId = currentGame.Id;
 
             _context.Players.Add(player);
-            //_context.Entry(player).State = EntityState.Added;
 
             currentGame.Players.Add(player);
 

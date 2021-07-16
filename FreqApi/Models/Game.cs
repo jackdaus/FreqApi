@@ -13,6 +13,7 @@ namespace FreqApi.Models
         public DateTime CreationDate { get; set; }
 
         public ICollection<Player> Players { get; set; }
+        public ICollection<Axis> Axes { get; set; }
     }
 
     public class ActiveGame
@@ -24,7 +25,7 @@ namespace FreqApi.Models
     public enum Phase
     {
         Registration,
-        Ideation,
+        AxisIdeation,
         ClueGiving,
         Guessing,
         RoundResults,

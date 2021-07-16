@@ -92,7 +92,7 @@ namespace FreqApi.Hubs
                 await Clients.Caller.SendAsync("errorMsg", $"Game with id ${gameId} not found.");
                 return;
             }
-            if (game.Phase == Phase.Registration)
+            if (game.Phase != Phase.Registration)
             {
                 await Clients.Caller.SendAsync("errorMsg", $"Game with id ${gameId} is already in progress.");
                 return;
@@ -114,10 +114,47 @@ namespace FreqApi.Hubs
             this._gameService.StartGame(game.RoomCode);
         }
 
-        public async Task SubmitAxesIdea(Guid roomId, string leftWord, string rightWord)
+        public async Task SubmitAxisIdea(Guid gameId, string leftWord, string rightWord)
         {
-            //TODO add new Axes Idea
-            //await Clients.All.SendAsync("messageReceived", username, message);
+            var callingConnectionId = Context.ConnectionId;
+            var callingPlayer = _context.Players
+                .Where(player => player.ConnectionId == callingConnectionId)
+                .FirstOrDefault();
+
+            if (callingPlayer == null)
+            {
+                await Clients.Caller.SendAsync("errorMsg", $"Player with connectionId ${callingConnectionId} does not exist.");
+                return;
+            }
+
+            var game = _context.Games
+                .Where(game => game.Id == gameId)
+                .FirstOrDefault();
+
+            if (game == null)
+            {
+                await Clients.Caller.SendAsync("errorMsg", $"Game with id ${gameId} not found.");
+                return;
+            }
+
+            if (game.Phase != Phase.AxisIdeation)
+            {
+                await Clients.Caller.SendAsync("errorMsg", $"Game with id ${gameId} is not in phase ${nameof(Phase.AxisIdeation)}");
+                return;
+            }
+
+            Axis newAxis = new Axis();
+            newAxis.Id = new Guid();
+            newAxis.AxisAuthorId = callingPlayer.Id;
+            newAxis.GameId = game.Id;
+            newAxis.LeftWord = leftWord;
+            newAxis.RightWord = rightWord;
+
+            _context.Axes.Add(newAxis);
+
+            await _context.SaveChangesAsync();
+
+            //todo, if all users have submitted an axis idea, then start game
         }
 
         public async Task SubmitClue(Guid AxisId, string clue)

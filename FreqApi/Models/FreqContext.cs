@@ -10,5 +10,6 @@ namespace FreqApi.Models
 
         public DbSet<Game> Games { get; set; }
         public DbSet<Player> Players { get; set; }
+        public DbSet<Axis> Axes { get; set; }
     }
 }
